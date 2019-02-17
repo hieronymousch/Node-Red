@@ -1,0 +1,338 @@
+[
+    {
+        "id": "53debeb0.2f2f9",
+        "type": "inject",
+        "z": "d0d5883c.e6c2a8",
+        "name": "",
+        "topic": "",
+        "payload": "getInfo",
+        "payloadType": "str",
+        "repeat": "60",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 107,
+        "y": 75,
+        "wires": [
+            [
+                "f340b966.26b5a8"
+            ]
+        ]
+    },
+    {
+        "id": "f340b966.26b5a8",
+        "type": "smart-plug",
+        "z": "d0d5883c.e6c2a8",
+        "name": "HS110(FR)",
+        "device": "192.168.x.y",
+        "interval": 10000,
+        "eventInterval": 1000,
+        "x": 133,
+        "y": 152,
+        "wires": [
+            [
+                "afc119c.35e6ce8"
+            ]
+        ]
+    },
+    {
+        "id": "afc119c.35e6ce8",
+        "type": "function",
+        "z": "d0d5883c.e6c2a8",
+        "name": "GetRelayState",
+        "func": "var relay = Number(msg.payload.relay_state);\ncontext.set('relay',relay);\nmsg.relay=relay;\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 131,
+        "y": 236,
+        "wires": [
+            [
+                "61d89cc6.b19774",
+                "47eecb31.55c164",
+                "17d5971d.490b69"
+            ]
+        ]
+    },
+    {
+        "id": "47eecb31.55c164",
+        "type": "debug",
+        "z": "d0d5883c.e6c2a8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "relay",
+        "x": 102,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "17d5971d.490b69",
+        "type": "switch",
+        "z": "d0d5883c.e6c2a8",
+        "name": "RelayOff",
+        "property": "relay",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 126,
+        "y": 620,
+        "wires": [
+            [
+                "ca6f0799.d22bc8"
+            ],
+            [
+                "b2bf9ae3.517f58"
+            ]
+        ]
+    },
+    {
+        "id": "61d89cc6.b19774",
+        "type": "http request",
+        "z": "d0d5883c.e6c2a8",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "url": "http://emoncms/feed/value.json?id=zzz&apikey=xxxxxxx",
+        "tls": "",
+        "x": 379,
+        "y": 237,
+        "wires": [
+            [
+                "e525f0c2.debd9"
+            ]
+        ]
+    },
+    {
+        "id": "e525f0c2.debd9",
+        "type": "function",
+        "z": "d0d5883c.e6c2a8",
+        "name": "Voltage",
+        "func": "var voltage = Number(msg.payload);\ncontext.set('voltage',voltage);\nmsg.voltage=voltage;\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 399,
+        "y": 344,
+        "wires": [
+            [
+                "abaa353a.2da9b8",
+                "17d5971d.490b69"
+            ]
+        ]
+    },
+    {
+        "id": "ca6f0799.d22bc8",
+        "type": "switch",
+        "z": "d0d5883c.e6c2a8",
+        "name": "VoltageLow",
+        "property": "voltage",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lt",
+                "v": "11.5",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 315,
+        "y": 514,
+        "wires": [
+            [
+                "dfff8f37.27ad6",
+                "3d83793.d7d9486"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "3d83793.d7d9486",
+        "type": "function",
+        "z": "d0d5883c.e6c2a8",
+        "name": "PowerOn",
+        "func": "msg.payload=Boolean(true)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 500,
+        "y": 560,
+        "wires": [
+            [
+                "78ae75cc.d739bc",
+                "a5f1d421.8f1238"
+            ]
+        ]
+    },
+    {
+        "id": "b823aa5.61e5b58",
+        "type": "function",
+        "z": "d0d5883c.e6c2a8",
+        "name": "PowerOff",
+        "func": "msg.payload=Boolean(false)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 499,
+        "y": 660,
+        "wires": [
+            [
+                "78ae75cc.d739bc",
+                "a5f1d421.8f1238"
+            ]
+        ]
+    },
+    {
+        "id": "78ae75cc.d739bc",
+        "type": "smart-plug",
+        "z": "d0d5883c.e6c2a8",
+        "name": "HS110(FR)",
+        "device": "xxx.yyy",
+        "interval": 10000,
+        "eventInterval": 1000,
+        "x": 681,
+        "y": 616,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "64da8b9e.3075a4",
+        "type": "telegram sender",
+        "z": "d0d5883c.e6c2a8",
+        "name": "",
+        "bot": "4703cbbf.c03bc4",
+        "x": 945,
+        "y": 611,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dfff8f37.27ad6",
+        "type": "function",
+        "z": "d0d5883c.e6c2a8",
+        "name": "TelegramPowerOn",
+        "func": "msg.payload = {chatId :123456789, type : 'message', content : \"SmartPlug garage turned on\"}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 676,
+        "y": 502,
+        "wires": [
+            [
+                "64da8b9e.3075a4"
+            ]
+        ]
+    },
+    {
+        "id": "31beddd2.a16882",
+        "type": "function",
+        "z": "d0d5883c.e6c2a8",
+        "name": "TelegramPowerOff",
+        "func": "msg.payload = {chatId :123456789, type : 'message', content : \"SmartPlug garage turned off\"}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 705,
+        "y": 712,
+        "wires": [
+            [
+                "64da8b9e.3075a4"
+            ]
+        ]
+    },
+    {
+        "id": "abaa353a.2da9b8",
+        "type": "debug",
+        "z": "d0d5883c.e6c2a8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "voltage",
+        "x": 297,
+        "y": 391,
+        "wires": []
+    },
+    {
+        "id": "b2bf9ae3.517f58",
+        "type": "switch",
+        "z": "d0d5883c.e6c2a8",
+        "name": "VoltagHigh",
+        "property": "voltage",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "12.5",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 310,
+        "y": 722,
+        "wires": [
+            [
+                "b823aa5.61e5b58",
+                "31beddd2.a16882"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "a5f1d421.8f1238",
+        "type": "debug",
+        "z": "d0d5883c.e6c2a8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 470,
+        "y": 611,
+        "wires": []
+    },
+    {
+        "id": "4703cbbf.c03bc4",
+        "type": "telegram bot",
+        "z": "",
+        "botname": "SuperBot",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "updatemode": "polling",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksport": "6667",
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "verboselogging": false
+    }
+]
